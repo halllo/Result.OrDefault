@@ -30,23 +30,13 @@ namespace Result.OrDefault
 			var nextExpression = memberAccess != null ? memberAccess.Expression : methodCall.Object;
 			var nextMemberAccess = nextExpression as MemberExpression;
 			var nextMethodCall = nextExpression as MethodCallExpression;
+
 			if (nextMemberAccess != null)
 			{
 				var instance = GetRecursive(nextMemberAccess, null);
 				if (instance != null)
 				{
-					if (memberAccess != null)
-					{
-						var propertyInvocation = (PropertyInfo)memberAccess.Member;
-						var newInstance = propertyInvocation.GetValue(instance);
-						return newInstance;
-					}
-					else
-					{
-						var methodInvocation = methodCall.Method;
-						var newInstance = methodInvocation.Invoke(instance, new object[0]);
-						return newInstance;
-					}
+					return GetOrInvoke(instance, memberAccess, methodCall);
 				}
 				else
 				{
@@ -58,18 +48,7 @@ namespace Result.OrDefault
 				var instance = GetRecursive(null, nextMethodCall);
 				if (instance != null)
 				{
-					if (memberAccess != null)
-					{
-						var propertyInvocation = (PropertyInfo)memberAccess.Member;
-						var newInstance = propertyInvocation.GetValue(instance);
-						return newInstance;
-					}
-					else
-					{
-						var methodInvocation = methodCall.Method;
-						var newInstance = methodInvocation.Invoke(instance, new object[0]);
-						return newInstance;
-					}
+					return GetOrInvoke(instance, memberAccess, methodCall);
 				}
 				else
 				{
@@ -78,30 +57,58 @@ namespace Result.OrDefault
 			}
 			else
 			{
-				if (memberAccess != null)
+				return GetRoot(memberAccess, methodCall);
+			}
+		}
+
+		private static object GetOrInvoke(object instance, MemberExpression memberAccess, MethodCallExpression methodCall)
+		{
+			if (memberAccess != null)
+			{
+				var propertyInvocation = (PropertyInfo)memberAccess.Member;
+				var newInstance = propertyInvocation.GetValue(instance);
+				return newInstance;
+			}
+			else
+			{
+				var methodInvocation = methodCall.Method;
+				var newInstance = methodInvocation.Invoke(instance, GetArguments(methodCall.Arguments));
+				return newInstance;
+			}
+		}
+
+		private static object GetRoot(MemberExpression memberAccess, MethodCallExpression methodCall)
+		{
+			if (memberAccess != null)
+			{
+				var constantExpression = (ConstantExpression)memberAccess.Expression;
+				var closureField = memberAccess.Member as FieldInfo;
+				if (closureField != null)
 				{
-					var constantExpression = (ConstantExpression)memberAccess.Expression;
-					var closureField = memberAccess.Member as FieldInfo;
-					if (closureField != null)
-					{
-						var instance = closureField.GetValue(constantExpression.Value);
-						return instance;
-					}
-					else
-					{
-						var closureProperty = memberAccess.Member as PropertyInfo;
-						var instace = closureProperty.GetValue(constantExpression.Value);
-						return instace;
-					}
+					var instance = closureField.GetValue(constantExpression.Value);
+					return instance;
 				}
 				else
 				{
-					var constantExpression = (ConstantExpression)methodCall.Object;
-					var closureMethod = methodCall.Method;
-					var instance = closureMethod.Invoke(constantExpression.Value, new object[0]);
-					return instance;
+					var closureProperty = memberAccess.Member as PropertyInfo;
+					var instace = closureProperty.GetValue(constantExpression.Value);
+					return instace;
 				}
 			}
+			else
+			{
+				var constantExpression = (ConstantExpression)methodCall.Object;
+				var closureMethod = methodCall.Method;
+				var instance = closureMethod.Invoke(constantExpression.Value, GetArguments(methodCall.Arguments));
+				return instance;
+			}
+		}
+
+		private static object[] GetArguments(IEnumerable<Expression> arguments)
+		{
+			return arguments
+				.Select(a => Expression.Lambda<Func<object>>(a).Compile()())
+				.ToArray<object>();
 		}
 	}
 }

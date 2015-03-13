@@ -38,15 +38,24 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void MethodWithParameter()
+		public void MethodWithStaticPropertyParameter()
 		{
-			double value = 4.3;
+			var value = 4.3;
 			Assert.AreEqual("4.3", Result.OrDefault(() => value.ToString(CultureInfo.InvariantCulture)));
 		}
 
 
 		[TestMethod]
-		public void MethodThrowsTest()
+		public void MethodWithConstantAndClosureParameter()
+		{
+			var replacement = string.Empty;
+			var value = "hallo";
+			Assert.AreEqual("hao", Result.OrDefault(() => value.Replace("l", replacement)));
+		}
+
+
+		[TestMethod]
+		public void MethodThrowingException()
 		{
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.ValueM()).Throws<DivideByZeroException>();
@@ -62,7 +71,7 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void PropertyThrowsTest()
+		public void PropertyThrowingException()
 		{
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.ValueP).Throws<DivideByZeroException>();
@@ -78,7 +87,7 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void MethodPropertyVariationsTest()
+		public void MethodPropertyVariations()
 		{
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
@@ -95,7 +104,7 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void FirstCallIsAMethodTest()
+		public void FirstCallIsAMethod()
 		{
 			Assert.AreEqual("ja", Result.OrDefault(() => MyMethod().ValueM(), defaultValue: "nein"));
 		}
@@ -108,7 +117,7 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void FirstCallIsAPropertyTest()
+		public void FirstCallIsAProperty()
 		{
 			Assert.AreEqual("ja", Result.OrDefault(() => MyProperty.ValueM(), defaultValue: "nein"));
 		}
@@ -124,7 +133,7 @@ namespace Result.OrDefault
 
 
 		[TestMethod]
-		public void PerformanceTrainHelperTest()
+		public void PerformanceTrainHelper()
 		{
 			Assert.Inconclusive();
 			var mock = new Mock<I>();
@@ -136,7 +145,7 @@ namespace Result.OrDefault
 			}
 		}
 		[TestMethod]
-		public void PerformanceNoTrainHelperTest()
+		public void PerformanceNoTrainHelper()
 		{
 			Assert.Inconclusive();
 			var mock = new Mock<I>();
@@ -148,7 +157,7 @@ namespace Result.OrDefault
 			}
 		}
 		[TestMethod]
-		public void PerformanceNoTrainHelperKorayTest()
+		public void PerformanceNoTrainHelperKoray()
 		{
 			Assert.Inconclusive();
 			var mock = new Mock<I>();
