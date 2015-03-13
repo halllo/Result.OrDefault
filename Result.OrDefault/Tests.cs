@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Globalization;
 
 namespace Result.OrDefault
 {
@@ -33,6 +34,14 @@ namespace Result.OrDefault
 			catch (NullReferenceException expected)
 			{
 			}
+		}
+
+
+		[TestMethod]
+		public void MethodWithParameter()
+		{
+			double value = 4.3;
+			Assert.AreEqual("4.3", Result.OrDefault(() => value.ToString(CultureInfo.InvariantCulture)));
 		}
 
 
@@ -117,7 +126,7 @@ namespace Result.OrDefault
 		[TestMethod]
 		public void PerformanceTrainHelperTest()
 		{
-			//Assert.Inconclusive();
+			Assert.Inconclusive();
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
 
@@ -129,7 +138,7 @@ namespace Result.OrDefault
 		[TestMethod]
 		public void PerformanceNoTrainHelperTest()
 		{
-			//Assert.Inconclusive();
+			Assert.Inconclusive();
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
 
@@ -141,7 +150,7 @@ namespace Result.OrDefault
 		[TestMethod]
 		public void PerformanceNoTrainHelperKorayTest()
 		{
-			//Assert.Inconclusive();
+			Assert.Inconclusive();
 			var mock = new Mock<I>();
 			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
 
