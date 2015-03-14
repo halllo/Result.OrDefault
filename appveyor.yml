@@ -22,11 +22,12 @@ after_test:
 artifacts:
   - path: Result.OrDefault\bin\Release\Result.OrDefault.dll
     name: Result.OrDefault.dll
-  - path: '**\*.nupkg'
+  - path: .nuget\Result.OrDefault.compiled.nupkg
+    name: Result.OrDefault.compiled.nupkg
 
 deploy:
   provider: NuGet
   api_key:
     secure: mYNxybjJqKR3bOn+cYo6o7SPvlgOApzwnI7rep4TCYjTjYgb7T1fG28lFrgcX2Jk
-  artifact: /.*\.nupkg/
+  artifact: Result.OrDefault.compiled.nupkg
   
