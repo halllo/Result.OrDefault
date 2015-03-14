@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Result.OrDefault</id>
+        <version>1.0.2</version>
+        <authors>Manuel Naujoks</authors>
+        <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+        <projectUrl>https://github.com/halllo/Result.OrDefault</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Instead of null checks you can simply write for example Result.OrDefault(() =&gt; SelectedItem.Invoice.Employee.Name.ToString());</description>
+        <summary>Simple null propagation for pre-C#6</summary>
+        <releaseNotes />
+        <tags>result.ordefault resultordefault null propagation checks if conditional condition</tags>
+    </metadata>
+    <files>
+        <file src="Result.OrDefault\bin\Debug\Result.OrDefault.dll" target="lib\portable-net4+win8+wp8+wpa81\Result.OrDefault.dll" />
+    </files>
+</package>
