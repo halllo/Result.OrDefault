@@ -3,6 +3,9 @@ Result.OrDefault
 C#6 will support null propagation (https://github.com/dotnet/roslyn/wiki/Languages-features-in-C%23-6-and-VB-14).
 Result.OrDefault is simple null propagation for pre-C#6.
 
+[![NuGet downloads](https://img.shields.io/nuget/dt/Result.OrDefault.svg)](https://www.nuget.org/packages/Result.OrDefault)
+[![Version](https://img.shields.io/nuget/v/Result.OrDefault.svg)](https://www.nuget.org/packages/Result.OrDefault)
+
 Do you know requirements like "display the employees name in the invoice view"? Then probably your ViewModel code looks a lot like this.
 ```csharp
 public string EmployeeName
