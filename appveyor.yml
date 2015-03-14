@@ -17,7 +17,7 @@ build:
   project: Result.OrDefault.sln
 
 after_test:
-  - ps: .\nuget\pack.ps1
+  - ps: .\.nuget\pack.ps1
 
 artifacts:
   - path: Result.OrDefault\bin\Release\Result.OrDefault.dll
