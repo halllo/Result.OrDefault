@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Result.OrDefault
+namespace ResultOrDefault
 {
 	public class Result
 	{
@@ -66,7 +66,7 @@ namespace Result.OrDefault
 			if (memberAccess != null)
 			{
 				var propertyInvocation = (PropertyInfo)memberAccess.Member;
-				var newInstance = propertyInvocation.GetValue(instance);
+				var newInstance = propertyInvocation.GetValue(instance, new object[0]);
 				return newInstance;
 			}
 			else
@@ -91,7 +91,7 @@ namespace Result.OrDefault
 				else
 				{
 					var closureProperty = memberAccess.Member as PropertyInfo;
-					var instace = closureProperty.GetValue(constantExpression.Value);
+					var instace = closureProperty.GetValue(constantExpression.Value, new object[0]);
 					return instace;
 				}
 			}

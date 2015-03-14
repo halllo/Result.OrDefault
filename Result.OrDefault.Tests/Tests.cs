@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Globalization;
 
-namespace Result.OrDefault
+namespace ResultOrDefault.Tests
 {
 	[TestClass]
 	public class Tests
