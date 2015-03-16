@@ -63,9 +63,20 @@ namespace ResultOrDefault
 		{
 			if (memberAccess != null)
 			{
-				var propertyInvocation = (PropertyInfo)memberAccess.Member;
-				var newInstance = propertyInvocation.GetValue(instance, new object[0]);
-				return newInstance;
+				if (memberAccess.Member is PropertyInfo)
+				{
+					var property = (PropertyInfo)memberAccess.Member;
+					return property.GetValue(instance, new object[0]);
+				}
+				else if (memberAccess.Member is FieldInfo)
+				{
+					var field = (FieldInfo)memberAccess.Member;
+					return field.GetValue(instance);
+				}
+				else
+				{
+					throw new NotSupportedException();
+				}
 			}
 			else
 			{
@@ -79,33 +90,23 @@ namespace ResultOrDefault
 		{
 			if (memberAccess != null)
 			{
-				if (memberAccess.Expression is ConstantExpression)
+				if (memberAccess.Expression == null)
 				{
-					var constantExpression = (ConstantExpression)memberAccess.Expression;
-					if (constantExpression.Value == null)
-					{
-						return null;
-					}
-					else if (memberAccess.Member is PropertyInfo)
-					{
-						var closureProperty = (PropertyInfo)memberAccess.Member;
-						return closureProperty.GetValue(constantExpression.Value, new object[0]);
-					}
-					else if (memberAccess.Member is FieldInfo)
-					{
-						var closureField = (FieldInfo)memberAccess.Member;
-						return closureField.GetValue(constantExpression.Value);
-					}
-					else
-					{
-						throw new NotSupportedException();
-					}
+					return GetOrInvoke(null, memberAccess, null);
 				}
 				else
 				{
-					var instance = Expression.Lambda<Func<object>>(memberAccess.Expression).Compile()();
-					var property = (PropertyInfo)memberAccess.Member;
-					return instance != null ? property.GetValue(instance, new object[0]): null;
+					if (memberAccess.Expression is ConstantExpression)
+					{
+						var constantExpression = (ConstantExpression)memberAccess.Expression;
+						return constantExpression.Value != null ? GetOrInvoke(constantExpression.Value, memberAccess, null) : null;
+					}
+					else
+					{
+						var instance = Expression.Lambda<Func<object>>(memberAccess.Expression).Compile()();
+						var property = (PropertyInfo)memberAccess.Member;
+						return instance != null ? property.GetValue(instance, new object[0]) : null;
+					}
 				}
 			}
 			else

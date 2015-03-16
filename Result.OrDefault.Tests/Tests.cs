@@ -140,6 +140,18 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
+		public void StaticClassProperty()
+		{
+			Assert.AreEqual("a", Result.OrDefault(() => C1.MyStaticProperty));
+		}
+		private class C1
+		{
+			public static string MyStaticProperty { get { return "a"; } }
+		}
+
+
+
+		[TestMethod]
 		public void Raises_exception_when_parameters_are_used_in_the_expression__1()
 		{
 			var value = 4.3;
@@ -159,6 +171,26 @@ namespace ResultOrDefault.Tests
 			Assert.IsNull(Result.OrDefault(() => ((string)null).Trim()));
 			Assert.AreEqual(-1, Result.OrDefault(() => ((string)null).Length, defaultValue: -1));
 			Assert.IsNull(Result.OrDefault(() => ((string)null).ToString(CultureInfo.InvariantCulture)));
+		}
+
+
+		[TestMethod]
+		public void InvalidCastException_for_accessing_a_field_from_an_instance__3()
+		{
+			var value = new SomeClass();
+			Assert.AreEqual("field", Result.OrDefault(() => value.Field));
+		}
+		public class SomeClass
+		{
+			public SomeClass() { Field = "field"; }
+			public string Field;
+		}
+
+
+		[TestMethod]
+		public void Got_an_ArgumentNullException_when_accessing_a_property_from_a_property_from_an_instance__4()
+		{
+			Assert.IsNotNull(Result.OrDefault(() => DateTime.Now.Kind));
 		}
 	}
 }

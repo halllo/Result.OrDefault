@@ -9,7 +9,7 @@ namespace ResultOrDefault.Tests
 		[TestInitialize]
 		public void Initialize()
 		{
-			//Assert.Inconclusive();
+			Assert.Inconclusive();
 		}
 
 		[TestMethod]
