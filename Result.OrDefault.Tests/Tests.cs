@@ -1,24 +1,14 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System;
 using System.Globalization;
+using System.Linq;
 
 namespace ResultOrDefault.Tests
 {
 	[TestClass]
 	public class Tests
 	{
-		public interface I
-		{
-			string ValueP { get; }
-			string ValueM();
-			I MeP { get; }
-			I MeM();
-		}
-
-
 		[TestMethod]
 		public void DefaultTest()
 		{
@@ -34,14 +24,6 @@ namespace ResultOrDefault.Tests
 			catch (NullReferenceException expected)
 			{
 			}
-		}
-
-
-		[TestMethod]
-		public void MethodWithStaticPropertyParameter()
-		{
-			var value = 4.3;
-			Assert.AreEqual("4.3", Result.OrDefault(() => value.ToString(CultureInfo.InvariantCulture)));
 		}
 
 
@@ -117,6 +99,17 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
+		public void StaticMethod()
+		{
+			Assert.IsNull(Result.OrDefault(() => MyStaticMethod().ToString()));
+		}
+		private static string MyStaticMethod()
+		{
+			return null;
+		}
+
+
+		[TestMethod]
 		public void FirstCallIsAProperty()
 		{
 			Assert.AreEqual("ja", Result.OrDefault(() => MyProperty.ValueM(), defaultValue: "nein"));
@@ -133,63 +126,39 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
-		public void PerformanceTrainHelper()
+		public void StaticProperty()
 		{
-			Assert.Inconclusive();
-			var mock = new Mock<I>();
-			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
-
-			for (int i = 0; i < 1000000; i++)
+			Assert.IsNull(Result.OrDefault(() => MyStaticMethod().ToString()));
+		}
+		private static string MyStaticProperty
+		{
+			get
 			{
-				Result.OrDefault(() => mock.Object.MeP.MeM().MeP.ValueP);
+				return null;
 			}
 		}
-		[TestMethod]
-		public void PerformanceNoTrainHelper()
-		{
-			Assert.Inconclusive();
-			var mock = new Mock<I>();
-			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
 
-			for (int i = 0; i < 1000000; i++)
-			{
-				var value = mock.Object.MeP.MeM().MeP.ValueP;
-			}
+
+		[TestMethod]
+		public void Raises_exception_when_parameters_are_used_in_the_expression__1()
+		{
+			var value = 4.3;
+			Assert.AreEqual("4.3", Result.OrDefault(() => value.ToString(CultureInfo.InvariantCulture)));
 		}
+
+
 		[TestMethod]
-		public void PerformanceNoTrainHelperKoray()
+		public void Other_cases_raising_exceptions__2()
 		{
-			Assert.Inconclusive();
-			var mock = new Mock<I>();
-			mock.Setup(i => i.MeP.MeM().MeP.ValueP).Returns("ja");
+			Assert.AreEqual("\0", Result.OrDefault(() => "abc".Trim().FirstOrDefault(char.IsControl).ToString(CultureInfo.InvariantCulture)));
+			Assert.AreEqual("\0", Result.OrDefault(() => "abc".Trim().FirstOrDefault(char.IsControl).ToString()));
 
-			for (int i = 0; i < 1000000; i++)
-			{
-				if (mock.Object.MeP == null)
-				{
-					continue;
-				}
+			Assert.AreEqual("aaa", Result.OrDefault(() => new string('a', 3).Trim()));
+			Assert.AreEqual(3, Result.OrDefault(() => new string('a', 3).Length));
 
-				var meM = mock.Object.MeP.MeM();
-				if (meM == null)
-				{
-					continue;
-				}
-
-				var meP = meM.MeP;
-				if (meP == null)
-				{
-					continue;
-				}
-
-				var valueP = meP.ValueP;
-				if (valueP == null)
-				{
-					continue;
-				}
-
-				var value = valueP;
-			}
+			Assert.IsNull(Result.OrDefault(() => ((string)null).Trim()));
+			Assert.AreEqual(-1, Result.OrDefault(() => ((string)null).Length, defaultValue: -1));
+			Assert.IsNull(Result.OrDefault(() => ((string)null).ToString(CultureInfo.InvariantCulture)));
 		}
 	}
 }

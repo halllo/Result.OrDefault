@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ResultOrDefault
 {
@@ -81,26 +79,57 @@ namespace ResultOrDefault
 		{
 			if (memberAccess != null)
 			{
-				var constantExpression = (ConstantExpression)memberAccess.Expression;
-				var closureField = memberAccess.Member as FieldInfo;
-				if (closureField != null)
+				if (memberAccess.Expression is ConstantExpression)
 				{
-					var instance = closureField.GetValue(constantExpression.Value);
-					return instance;
+					var constantExpression = (ConstantExpression)memberAccess.Expression;
+					if (constantExpression.Value == null)
+					{
+						return null;
+					}
+					else if (memberAccess.Member is PropertyInfo)
+					{
+						var closureProperty = (PropertyInfo)memberAccess.Member;
+						return closureProperty.GetValue(constantExpression.Value, new object[0]);
+					}
+					else if (memberAccess.Member is FieldInfo)
+					{
+						var closureField = (FieldInfo)memberAccess.Member;
+						return closureField.GetValue(constantExpression.Value);
+					}
+					else
+					{
+						throw new NotSupportedException();
+					}
 				}
 				else
 				{
-					var closureProperty = memberAccess.Member as PropertyInfo;
-					var instace = closureProperty.GetValue(constantExpression.Value, new object[0]);
-					return instace;
+					var instance = Expression.Lambda<Func<object>>(memberAccess.Expression).Compile()();
+					var property = (PropertyInfo)memberAccess.Member;
+					return instance != null ? property.GetValue(instance, new object[0]): null;
 				}
 			}
 			else
 			{
-				var constantExpression = (ConstantExpression)methodCall.Object;
-				var closureMethod = methodCall.Method;
-				var instance = closureMethod.Invoke(constantExpression.Value, GetArguments(methodCall.Arguments));
-				return instance;
+				var method = methodCall.Method;
+				var arguments = GetArguments(methodCall.Arguments);
+
+				if (methodCall.Object == null)
+				{
+					return method.Invoke(null, arguments);
+				}
+				else
+				{
+					if (methodCall.Object is ConstantExpression)
+					{
+						var constantExpression = (ConstantExpression)methodCall.Object;
+						return constantExpression.Value != null ? method.Invoke(constantExpression.Value, arguments) : null;
+					}
+					else
+					{
+						var instance = Expression.Lambda<Func<object>>(methodCall.Object).Compile()();
+						return instance != null ? method.Invoke(instance, arguments) : null;
+					}
+				}
 			}
 		}
 
