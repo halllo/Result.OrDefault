@@ -152,7 +152,7 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
-		public void Raises_exception_when_parameters_are_used_in_the_expression__1()
+		public void Issue1__Raises_exception_when_parameters_are_used_in_the_expression()
 		{
 			var value = 4.3;
 			Assert.AreEqual("4.3", Result.OrDefault(() => value.ToString(CultureInfo.InvariantCulture)));
@@ -160,7 +160,7 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
-		public void Other_cases_raising_exceptions__2()
+		public void Issue2__Other_cases_raising_exceptions()
 		{
 			Assert.AreEqual("\0", Result.OrDefault(() => "abc".Trim().FirstOrDefault(char.IsControl).ToString(CultureInfo.InvariantCulture)));
 			Assert.AreEqual("\0", Result.OrDefault(() => "abc".Trim().FirstOrDefault(char.IsControl).ToString()));
@@ -175,7 +175,7 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
-		public void InvalidCastException_for_accessing_a_field_from_an_instance__3()
+		public void Issue3__InvalidCastException_for_accessing_a_field_from_an_instance()
 		{
 			var value = new SomeClass();
 			Assert.AreEqual("field", Result.OrDefault(() => value.Field));
@@ -188,9 +188,22 @@ namespace ResultOrDefault.Tests
 
 
 		[TestMethod]
-		public void Got_an_ArgumentNullException_when_accessing_a_property_from_a_property_from_an_instance__4()
+		public void Issue4__Got_an_ArgumentNullException_when_accessing_a_property_from_a_property_from_an_instance()
 		{
-			Assert.IsNotNull(Result.OrDefault(() => DateTime.Now.Kind));
+			Assert.AreEqual(DateTimeKind.Local, Result.OrDefault(() => DateTime.Now.Kind));
 		}
+
+
+		[TestMethod]
+		public void Issue5__Got_an_ArgumentNullException_when_accessing_a_field_from_a_field_from_an_instance()
+		{
+			Assert.AreEqual("field", Result.OrDefault(() => _someStaticInstance.Field));
+		}
+		public class SomeClass2
+		{
+			public SomeClass2() {Field = "field";}
+			public string Field;
+		}
+		private static SomeClass2 _someStaticInstance = new SomeClass2();
 	}
 }
